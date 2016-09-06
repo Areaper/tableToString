@@ -3,17 +3,20 @@ function table.tostringex (t)
 
 	function toStringF (k, v)
 		if "number" == type(k) then
-			table.insert(tableT, string.format("[%s]=", k))
 		elseif "string" == type(k) then
-			table.insert(tableT, string.format("\"%s\"=", k))
+			table.insert(tableT, string.format("%s=", k))
 		elseif "table" == type(k) then
-			table.insert(tableT, string.format("table: %s=", tostring(k)))
+			table.insert(tableT, string.format("table:%s=", k))
+		elseif "function" == type(k) then
+			table.insert(tableT, tostring(k))
 		end
 
 		if "table" == type(v) then
 			table.insert(tableT, table.tostringex(v))
-		else
+		elseif "number" == type(v) or "boolean" == type(v) then
 			table.insert(tableT, tostring(v))
+		else 
+			table.insert(tableT, string.format("\"%s\"", tostring(v)))
 		end
 
 		table.insert(tableT, ",")
@@ -41,7 +44,8 @@ function table.tostring (t, tabCountedP)
 			table.insert(tableT, string.format("[%s] = ", k))
 		elseif "string" == type(k) then
 			table.insert(tableT, string.format("\"%s\" = ", k))
-		-- elseif "table" == type(k) then
+		elseif "table" == type(k) then
+			table.insert(tableT, string.format("table: %s = ", tostring(k)))
 		end
 
 		if "table" == type(v) then
@@ -65,7 +69,8 @@ function table.tostring (t, tabCountedP)
 	return tableStr, tabCounted
 end
 
-local testTable = {"Leon", nil, name = "gjd", true, 
-					haha = 123, table.toString, {"leon", {"111", "222"}}}
-local getStr = table.tostring(testTable)
-print(getStr)
+function stringToTable (stringP)
+	local loadFunction = loadstring("return " .. stringP)
+	local loadTable = loadFunction()
+	return loadTable
+end
